@@ -41,8 +41,7 @@ def histo_plot_pvalue(U_0,abins,axlabel,aylabel,atitle,aname):
         verticalalignment='top', bbox=props)
 
         fig_pred_0.savefig(aname+"_p_values_plot.png")
-        #fig_pred_0.show()
-        plt.close(fig_pred_0)
+        #plt.close(fig_pred_0)
 
 def adaptive_binning_plot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,name):
 	if X_values.shape[1]==2:
