@@ -80,7 +80,7 @@ def chi2_adaptive_binning(orig_name, dim_list, comp_file_list_list,number_of_spl
 			data=np.r_[data_0,data_1]
 
 			no_dim = data.shape[1]-1
-			assert (no_dim ==dim_data), 	"The dimension of the data is inconsistent"
+			assert (no_dim ==dim_data), 	"The dimension of the data is inconsistent {} vs {}".format(no_dim,dim_data)
 
 			np.random.shuffle(data)
 
@@ -134,6 +134,14 @@ def chi2_adaptive_binning(orig_name, dim_list, comp_file_list_list,number_of_spl
 						
 						bin_points_dict[str(split_number)+bin_key[1:]+'a'] = np.array(a_points)
 						bin_points_dict[str(split_number)+bin_key[1:]+'b'] = np.array(b_points)
+						#If a bin contains no particles it should be deleted
+						if len(a_points)==0: 
+							del bin_points_dict[str(split_number)+bin_key[1:]+'a']
+							del bin_boundaries_dict[str(split_number)+bin_key[1:]+'a']
+                                                if len(b_points)==0: 
+                                                        del bin_points_dict[str(split_number)+bin_key[1:]+'b']
+                                                        del bin_boundaries_dict[str(split_number)+bin_key[1:]+'b']
+
 
 			check_key = '3aaa'
 			#check_key = str(max_number_of_splits)
