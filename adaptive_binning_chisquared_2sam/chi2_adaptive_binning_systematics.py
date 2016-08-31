@@ -163,9 +163,10 @@ def chi2_adaptive_binning_systematics(orig_name, dim_list, comp_file_list_list,n
 						#print("labels_in_bin : ",labels_in_bin)
 						bin_sample0 = np.count_nonzero( labels_in_bin == 0)
 						bin_sample1 = np.count_nonzero( labels_in_bin == 1)
+						print("systematics_fraction : ",systematics_fraction,"\nbin_sample0 : ",bin_sample0) 
 						#simulate uncertainties 
-						bin_sample0 += int(round(np.random.normal(0,systematics_fraction*bin_sample0)))
-                                                bin_sample1 += int(round(np.random.normal(0,systematics_fraction*bin_sample1)))
+						if(bin_sample0!=0):bin_sample0 += int(round(np.random.normal(0.,systematics_fraction*bin_sample0)))
+                                                if(bin_sample1!=0):bin_sample1 += int(round(np.random.normal(0.,systematics_fraction*bin_sample1)))
 						bins_sample01_dict[bin_key]=[bin_sample0,bin_sample1]
 						signed_Scp2_dict[bin_key] = np.square(float(bin_sample1-bin_sample0))/(float(bin_sample1)+float(bin_sample0)+np.square(float(bin_sample1)*systematics_fraction)+np.square(float(bin_sample1)*systematics_fraction))*np.sign(bin_sample1-bin_sample0)
 						#print("\n\nbin_sample0 : ",bin_sample0, "\n bins_sample0 : ", bins_sample0 )
