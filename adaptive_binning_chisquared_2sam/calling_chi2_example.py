@@ -3,12 +3,11 @@ from chi2_regular_binning import *
 from chi2_adaptive_binning import *
 from chi2_plots import *
 import os
-import chi2_binning
 
 def example_call():
 	orig_name="gaussian_same_projection_redefined_p_value_distribution__0_1__0_075"
 	dim_list = [1,2,3]
-	systematics_fraction = 0.1
+	systematics_fraction = 0.01
 
 	comp_file_list_list = []
 	adaptive_binning=False

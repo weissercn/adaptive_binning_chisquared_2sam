@@ -1,5 +1,5 @@
 import sys 
-from chi2_plots import *
+import chi2_plots
 import itertools
 
 """
@@ -9,15 +9,15 @@ features and lables.
 
 print(__doc__)
 import sys
-sys.path.insert(0,'../..')
+#sys.path.insert(0,'../..')
 import os
 from scipy import stats
 import numpy as np
-import matplotlib.pyplot as plt 
-import numpy.matlib
-from matplotlib.colors import Normalize
+#import matplotlib.pyplot as plt 
+#import numpy.matlib
+#from matplotlib.colors import Normalize
 
-from sklearn.preprocessing import StandardScaler
+#from sklearn.preprocessing import StandardScaler
 
 ##############################################################################
 # Setting parameters
@@ -71,7 +71,7 @@ def chi2_regular_binning_wrapper(orig_name, dim_list, comp_file_list_list,single
 
 			if dim_data==2: os.rename(str(dim_data) + "D_" + str(single_no_bins)+"_bins" +"_bin_definitions_2D.png",name+"_bin_definitions_2D.png")
                         if dim_data==1: os.rename(str(dim_data) + "D_" + str(single_no_bins)+"_bins" +"_bin_definitions_1D.png",name+"_bin_definitions_1D.png")
-                        histo_plot_pvalue(score_list,50,"p value","Frequency","p value distribution "+ str(single_no_bins) + " bins",name)
+                        chi2_plots.histo_plot_pvalue(score_list,50,"p value","Frequency","p value distribution "+ str(single_no_bins) + " bins",name)
 
 
 def chi2_regular_binning(features_0,features_1,single_no_bins_list,systematics_fraction=0.0,PLOT = True, DEBUG = False):
@@ -176,8 +176,8 @@ def chi2_regular_binning(features_0,features_1,single_no_bins_list,systematics_f
 				print("pvalue : {0}".format(str(pvalue)))
 
 			if PLOT:
-				if no_dim==1: regular_binning_1Dplot(data,single_no_bins,str(no_dim) + "D_" + str(single_no_bins)+"_bins")
-				if no_dim==2: regular_binning_2Dplot(keys, signed_Scp2,single_no_bins,X_values,str(no_dim) + "D_" + str(single_no_bins)+"_bins")
+				if no_dim==1: chi2_plots.regular_binning_1Dplot(data,single_no_bins,str(no_dim) + "D_" + str(single_no_bins)+"_bins")
+				if no_dim==2: chi2_plots.regular_binning_2Dplot(keys, signed_Scp2,single_no_bins,X_values,str(no_dim) + "D_" + str(single_no_bins)+"_bins")
 
 			results_list.append(pvalue)
 		return results_list

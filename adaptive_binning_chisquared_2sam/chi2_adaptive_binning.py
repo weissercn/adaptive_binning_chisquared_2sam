@@ -1,9 +1,8 @@
 from __future__ import print_function
 import sys 
-from chi2_plots import *
+import chi2_plots 
 import random
 import ast
-import os
 """
 This script can be used to get the p value for the Miranda method (=chi squared). It takes input files with column vectors corresponding to 
 features and lables. 
@@ -11,15 +10,15 @@ features and lables.
 
 print(__doc__)
 import sys
-sys.path.insert(0,'../..')
+#sys.path.insert(0,'../..')
 import os
 from scipy import stats
 import numpy as np
-import matplotlib.pyplot as plt 
-import numpy.matlib
-from matplotlib.colors import Normalize
+#import matplotlib.pyplot as plt 
+#import numpy.matlib
+#from matplotlib.colors import Normalize
 
-from sklearn.preprocessing import StandardScaler
+#from sklearn.preprocessing import StandardScaler
 
 ##############################################################################
 # Setting parameters
@@ -78,7 +77,7 @@ def chi2_adaptive_binning_wrapper(orig_name, dim_list, comp_file_list_list,numbe
                                         test_statistics_file.write(str(score)+"\n")
 			if dim_data==2: os.rename(str(dim_data) + "D_" + str(number_of_splits) + "_splits"+"_bin_definitions_2D.png",name+"_adaptive_binning_bin_definitions_2D.png")
                         if dim_data==1: os.rename(str(dim_data) + "D_" + str(number_of_splits) + "_splits"+"_bin_definitions_1D.png",name+"_adaptive_binning_bin_definitions_1D.png")
-                        histo_plot_pvalue(score_dict[str(number_of_splits)],50,"p value","Frequency","p value distribution "+ str(number_of_splits) + " splits",name+"_adaptive_binning")
+                        chi2_plots.histo_plot_pvalue(score_dict[str(number_of_splits)],50,"p value","Frequency","p value distribution "+ str(number_of_splits) + " splits",name+"_adaptive_binning")
 
 
 
@@ -220,8 +219,8 @@ def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematic
 		results_list.append(pvalue)
 
 		if PLOT: 
-			if no_dim==1: adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,str(no_dim) + "D_" + str(number_of_splits) + "_splits")
-			if no_dim==2: adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,str(no_dim) + "D_" + str(number_of_splits) + "_splits")
+			if no_dim==1: chi2_plots.adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,str(no_dim) + "D_" + str(number_of_splits) + "_splits")
+			if no_dim==2: chi2_plots.adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,str(no_dim) + "D_" + str(number_of_splits) + "_splits")
 
 	return results_list 
 

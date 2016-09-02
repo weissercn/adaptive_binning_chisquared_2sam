@@ -1,7 +1,8 @@
 import numpy as np
-import matplotlib
-from matplotlib.pylab import *
+#import matplotlib
+#from matplotlib.pylab import *
 import matplotlib.pyplot as plt
+import matplotlib.colors
 from matplotlib.patches import Rectangle
 import matplotlib.cm as cm
 import time
