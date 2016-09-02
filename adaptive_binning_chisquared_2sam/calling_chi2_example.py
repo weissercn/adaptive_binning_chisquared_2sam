@@ -5,7 +5,8 @@ from chi2_plots import *
 import os
 
 def example_call():
-	orig_name="gaussian_same_projection_redefined_p_value_distribution__0_1__0_075"
+	orig_name="gaussian_same_projection_redefined__0_1__0_75"
+	title="Gauss 0.1 0.75"
 	dim_list = [1,2,3]
 	systematics_fraction = 0.01
 
@@ -19,10 +20,10 @@ def example_call():
 	if adaptive_binning==True:
 		number_of_splits_list = [1,2]
 		#chi2_adaptive_binning.chi2_adaptive_binning(orig_name, dim_list, comp_file_list_list,number_of_splits_list)
-		chi2_adaptive_binning_wrapper(orig_name, dim_list, comp_file_list_list,number_of_splits_list,systematics_fraction)
+		chi2_adaptive_binning_wrapper(title,orig_name, dim_list, comp_file_list_list,number_of_splits_list,systematics_fraction)
 	else:
 		single_no_bins_list=[2,3,5]
-		chi2_regular_binning_wrapper(orig_name, dim_list, comp_file_list_list,single_no_bins_list,systematics_fraction)	
+		chi2_regular_binning_wrapper(title,orig_name, dim_list, comp_file_list_list,single_no_bins_list,systematics_fraction)	
 
 if __name__ == "__main__":
 	example_call()

@@ -30,7 +30,7 @@ import numpy as np
 #comp_file_list_list = ast.literal_eval(sys.argv[4])
 
 
-def chi2_adaptive_binning_wrapper(orig_name, dim_list, comp_file_list_list,number_of_splits_list,systematics_fraction):
+def chi2_adaptive_binning_wrapper(orig_title, orig_name, dim_list, comp_file_list_list,number_of_splits_list,systematics_fraction):
 
 	sample1_name="original"
 	sample2_name="modified"
@@ -63,27 +63,28 @@ def chi2_adaptive_binning_wrapper(orig_name, dim_list, comp_file_list_list,numbe
 			features_1=np.loadtxt(comp_file_1,dtype='d')
 
 			#only make a plot for the first data set
-			results_list=chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction, not counter,DEBUG)
+			results_list=chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction,orig_title,orig_name, not counter,DEBUG)
 			for number_of_splits_index, number_of_splits in enumerate(number_of_splits_list):
 				score_dict[str(number_of_splits)].append(results_list[number_of_splits_index])	
 
 			counter+=1
 
                 for number_of_splits in number_of_splits_list:
-                        name = orig_name + "_" +str(dim_data) + "D_miranda_" + str(number_of_splits) + "_splits"
-                        print("score_dict[{}] : ".format(number_of_splits), score_dict[str(number_of_splits)])
+                        name = orig_name + "_" +str(dim_data) + "D_chi2_" + str(number_of_splits) + "_splits"
+                        title= orig_title+ " " +str(dim_data) + "D "      + str(number_of_splits) + " splits" 
+			print("score_dict[{}] : ".format(number_of_splits), score_dict[str(number_of_splits)])
                         with open(name+"_adaptive_binning_p_values", "wb") as test_statistics_file:
                                 for score in score_dict[str(number_of_splits)]:
                                         test_statistics_file.write(str(score)+"\n")
-			if dim_data==2: os.rename(str(dim_data) + "D_" + str(number_of_splits) + "_splits"+"_bin_definitions_2D.png",name+"_adaptive_binning_bin_definitions_2D.png")
-                        if dim_data==1: os.rename(str(dim_data) + "D_" + str(number_of_splits) + "_splits"+"_bin_definitions_1D.png",name+"_adaptive_binning_bin_definitions_1D.png")
-                        chi2_plots.histo_plot_pvalue(score_dict[str(number_of_splits)],50,"p value","Frequency","p value distribution "+ str(number_of_splits) + " splits",name+"_adaptive_binning")
+			#if dim_data==2: os.rename("name_"+str(dim_data) + "D_" + str(number_of_splits) + "_splits"+"_bin_definitions_2D.png",name+"_bin_definitions_2D.png")
+                        #if dim_data==1: os.rename("name_"+str(dim_data) + "D_" + str(number_of_splits) + "_splits"+"_bin_definitions_1D.png",name+"_binning_bin_definitions_1D.png")
+                        chi2_plots.histo_plot_pvalue(score_dict[str(number_of_splits)],50,"p value","Frequency",title,name)
 
 
 
 
 
-def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction=0.0, PLOT = True, DEBUG = False):
+def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction=0.0,title = "title", name="name", PLOT = True, DEBUG = False):
 	"""This function takes in two 2D arrays with all features being columns"""
 
 	max_number_of_splits = np.max(number_of_splits_list)
@@ -219,8 +220,8 @@ def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematic
 		results_list.append(pvalue)
 
 		if PLOT: 
-			if no_dim==1: chi2_plots.adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,str(no_dim) + "D_" + str(number_of_splits) + "_splits")
-			if no_dim==2: chi2_plots.adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,str(no_dim) + "D_" + str(number_of_splits) + "_splits")
+			if no_dim==1: chi2_plots.adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,title+" "+str(no_dim) + "D "+str(number_of_splits)+ " splits ",name+"_"+str(no_dim) + "D_chi2_"+str(number_of_splits)+"_splits")
+			if no_dim==2: chi2_plots.adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,title+" "+str(no_dim) + "D"+str(number_of_splits)+ " splits ",name+"_"+str(no_dim) + "D_chi2_"+str(number_of_splits)+"_splits")
 
 	return results_list 
 

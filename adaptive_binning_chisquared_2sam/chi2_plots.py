@@ -31,7 +31,7 @@ def histo_plot_pvalue(U_0,abins,axlabel,aylabel,atitle,aname):
         n0, bins0, patches0 = ax1_pred_0.hist(U_0, bins=bins_probability, facecolor='red', alpha=0.5)
         ax1_pred_0.set_xlabel(axlabel)
         ax1_pred_0.set_ylabel(aylabel)
-        ax1_pred_0.set_title(atitle)
+        ax1_pred_0.set_title(atitle+ " p values")
         plt.xlim([0,1])
 
         # these are matplotlib.patch.Patch properties
@@ -44,7 +44,7 @@ def histo_plot_pvalue(U_0,abins,axlabel,aylabel,atitle,aname):
         fig_pred_0.savefig(aname+"_p_values_plot.png")
         #plt.close(fig_pred_0)
 
-def adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,name):
+def adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,title,name):
 	if X_values.shape[1]==2:
 		fig= plt.figure()
 		ax1= fig.add_subplot(1, 1, 1)	
@@ -66,14 +66,14 @@ def adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_split
 		plt.ylim(0.0,1.0)	
                 plt.xlabel("normalised x feature")
                 plt.ylabel("normalised y feature")
-                plt.title(name + "bin definitions" )
+                plt.title(name + " bin definitions" )
 		fig.savefig(name+"_bin_definitions_2D.png")
 		print("The plot {}_bin_definitions_2D.png has been made".format(name))
 	else:
 		print("You can only make this plot in 2D")
 
 
-def adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,name):
+def adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,title,name):
 	if data.shape[1]-1==1:
 		data0    = data[data[:,-1]==0]
                 data1    = data[data[:,-1]==1]
@@ -108,14 +108,14 @@ def adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,name):
 		plt.hist(features_1,bins=bin_boundaries,color='blue',label= 'modified',alpha=0.4,normed=True)
                 
 		plt.xlabel("normalised feature")
-                plt.title(name + "bin definitions" )
+                plt.title(title + " bin definitions" )
 		fig.savefig(name+"_bin_definitions_1D.png")
                 print("The plot {}_bin_definitions_1D.png has been made".format(name))
         else:
                 print("You can only make this plot in 1D")
 		
 
-def regular_binning_2Dplot(keys, signed_Scp2,single_no_bins,X_values,name):
+def regular_binning_2Dplot(keys, signed_Scp2,single_no_bins,X_values,title,name):
         no_dim = X_values.shape[1]
 	if no_dim==2:
 		no_bins = [single_no_bins]*no_dim
@@ -143,14 +143,14 @@ def regular_binning_2Dplot(keys, signed_Scp2,single_no_bins,X_values,name):
                 plt.ylim(0,1)
                 plt.xlabel("normalised x feature")
 		plt.ylabel("normalised y feature")
-                plt.title(name + "bin definitions" )
+                plt.title(title + " bin definitions" )
 
 		fig.savefig(name+"_bin_definitions_2D.png")
                 print("The plot {}_bin_definitions_2D.png has been made".format(name))
         else:
                 print("You can only make this plot in 2D")
 
-def regular_binning_1Dplot(data,single_no_bins,name):
+def regular_binning_1Dplot(data,single_no_bins,title,name):
         if data.shape[1]-1==1:
                 data0    = data[data[:,-1]==0]
                 data1    = data[data[:,-1]==1]
@@ -164,7 +164,7 @@ def regular_binning_1Dplot(data,single_no_bins,name):
                 plt.hist(features_0,bins=np.linspace(0,1,single_no_bins+1),color='red',label='original',alpha=0.4,normed=True)
                 plt.hist(features_1,bins=np.linspace(0,1,single_no_bins+1),color='blue',label= 'modified',alpha=0.4,normed=True)
 		plt.xlabel("normalised feature")
-		plt.title(name + "bin definitions" )
+		plt.title(title + " bin definitions" )
 
                 fig.savefig(name+"_bin_definitions_1D.png")
                 print("The plot {}_bin_definitions_1D.png has been made".format(name))
