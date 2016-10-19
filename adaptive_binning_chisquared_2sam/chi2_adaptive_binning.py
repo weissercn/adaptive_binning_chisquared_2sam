@@ -3,6 +3,7 @@ import sys
 import chi2_plots 
 import random
 import ast
+import pickle
 """
 This script can be used to get the p value for the Miranda method (=chi squared). It takes input files with column vectors corresponding to 
 features and lables. 
@@ -29,6 +30,27 @@ import numpy as np
 #dim_list = ast.literal_eval(sys.argv[3])
 #comp_file_list_list = ast.literal_eval(sys.argv[4])
 
+def weisser_searchsorted(l_test1, l_test2):
+        l_test1, l_test2 = np.array(l_test1), np.array(l_test2)
+        #print("l_test1 : ", l_test1)
+        l_tot = np.sort(np.append(l_test1, l_test2))
+        #print("l_tot : ", l_tot)
+        l_tot_cp, l_test1_cp, l_test2_cp  = l_tot.tolist(), l_test1.tolist(), l_test2.tolist()
+        pos1, pos2 = [],[]
+        #print("l_tot_cp : ",l_tot_cp)
+        for item_number, item in enumerate(l_tot_cp):
+                n1 = l_test1_cp.count(item)
+                n2 = l_test2_cp.count(item)
+                if np.random.choice(2, 1, p=[n1/float(n1+n2),n2/float(n1+n2) ]):
+                        l_test2_cp.remove(item)
+                        pos2.append(item_number)
+                else:
+                        l_test1_cp.remove(item)
+                        pos1.append(item_number)
+
+        pos1 = np.array(pos1)
+        pos2 = np.array(pos2)
+        return (pos1,pos2)
 
 def chi2_adaptive_binning_wrapper(orig_title, orig_name, dim_list, comp_file_list_list,number_of_splits_list,systematics_fraction):
 
@@ -73,7 +95,7 @@ def chi2_adaptive_binning_wrapper(orig_title, orig_name, dim_list, comp_file_lis
                         name = orig_name + "_" +str(dim_data) + "D_chi2_" + str(number_of_splits) + "_splits"
                         title= orig_title+ " " +str(dim_data) + "D "      + str(number_of_splits) + " splits" 
 			print("score_dict[{}] : ".format(number_of_splits), score_dict[str(number_of_splits)])
-                        with open(name+"_adaptive_binning_p_values", "wb") as test_statistics_file:
+                        with open(name+"_p_values", "wb") as test_statistics_file:
                                 for score in score_dict[str(number_of_splits)]:
                                         test_statistics_file.write(str(score)+"\n")
 			#if dim_data==2: os.rename("name_"+str(dim_data) + "D_" + str(number_of_splits) + "_splits"+"_bin_definitions_2D.png",name+"_bin_definitions_2D.png")
@@ -84,7 +106,7 @@ def chi2_adaptive_binning_wrapper(orig_title, orig_name, dim_list, comp_file_lis
 
 
 
-def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction=0.0,title = "title", name="name", PLOT = True, DEBUG = False):
+def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction=0.0,title = "title", name="name", PLOT = True, DEBUG = False, normalised = False):
 	"""This function takes in two 2D arrays with all features being columns"""
 
 	max_number_of_splits = np.max(number_of_splits_list)
@@ -166,7 +188,7 @@ def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematic
 					del bin_points_dict[str(split_number)+bin_key[1:]+'b']
 					del bin_boundaries_dict[str(split_number)+bin_key[1:]+'b']
 
-		
+	if PLOT:	pickle.dump( bin_boundaries_dict, open( "bin_boundaries_dict.p", "wb" ) )	
 	bins_sample01_dict= {}
 	signed_Scp2_dict= {}
 	results_list = []
@@ -221,7 +243,10 @@ def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematic
 
 		if PLOT: 
 			if no_dim==1: chi2_plots.adaptive_binning_1Dplot(bin_boundaries_dict,data,number_of_splits,title+" "+str(no_dim) + "D "+str(number_of_splits)+ " splits ",name+"_"+str(no_dim) + "D_chi2_"+str(number_of_splits)+"_splits")
-			if no_dim==2: chi2_plots.adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,title+" "+str(no_dim) + "D"+str(number_of_splits)+ " splits ",name+"_"+str(no_dim) + "D_chi2_"+str(number_of_splits)+"_splits")
+			if no_dim==2: chi2_plots.adaptive_binning_2Dplot(bin_boundaries_dict,signed_Scp2_dict,number_of_splits,X_values,title+" "+str(no_dim) + "D"+str(number_of_splits)+ " splits ",name+"_"+str(no_dim) + "D_chi2_"+str(number_of_splits)+"_splits", X_min= X_min,X_total_width=X_total_width )
+                        if no_dim>1:  chi2_plots.adaptive_binning_2D1Dplot(bin_boundaries_dict,bins_sample01_dict,number_of_splits,X_values,title+" "+str(no_dim) + "D"+str(number_of_splits)+ " splits ",name+"_"+str(no_dim) + "D_chi2_"+str(number_of_splits)+"_splits", no_dim)
+
+
 
 	return results_list 
 

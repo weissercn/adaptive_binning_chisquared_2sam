@@ -80,6 +80,8 @@ def chi2_regular_binning(features_0,features_1,single_no_bins,systematics_fracti
 		no_0=features_0.shape[0]
 		no_1=features_1.shape[0]
 
+		print("features_0 : ",features_0)
+
 		#Give all samples in file 0 the label 0 and in file 1 the feature 1
 		label_0=np.zeros((no_0,1))
 		label_1=np.ones((no_1,1))
@@ -106,13 +108,18 @@ def chi2_regular_binning(features_0,features_1,single_no_bins,systematics_fracti
 
 		#Scaling        
 		X_values = X_values - X_min[None,:]
-		X_values = X_values / X_total_width[None,:]
+		# to avoid dividing by infinity 
+		X_values = X_values / (X_total_width[None,:]+ 0.00000001)
 
+		print("X_total_width : ", X_total_width)
 		#b = X_values[:,0]
 		#print("b[b[:]>2].shape[0] : \n", b[b[:]>2].shape[0] )  
 		data = np.concatenate((X_values, labels[:,None]), axis=1)
 
 		bin_points_dict = {}
+
+		print("single_no_bins : ", single_no_bins)
+		print("no_dim : " , no_dim)
 
 		key_list = [list(p) for p in itertools.product(range(single_no_bins), repeat=no_dim)]
 		#for c in combinations_with_replacement(range(single_no_bins), no_dim):
@@ -127,6 +134,7 @@ def chi2_regular_binning(features_0,features_1,single_no_bins,systematics_fracti
 			#y_bin=int(np.floor((Xy_values[i]-Xy_min)/Xy_width))
 
 			pos_bins=np.floor(X_values[i,:]*no_bins).astype(int)
+			# to account fot the maximum point
 			pos_bins[pos_bins[:]==single_no_bins]=single_no_bins-1
 			#print(pos_bins)
 
@@ -177,7 +185,7 @@ def chi2_regular_binning(features_0,features_1,single_no_bins,systematics_fracti
 		if PLOT:
 				if no_dim==1: chi2_plots.regular_binning_1Dplot(data,single_no_bins,title,name)
 				if no_dim==2: chi2_plots.regular_binning_2Dplot(keys, signed_Scp2,single_no_bins,X_values,title,name)
-
+				if no_dim>1:  chi2_plots.regular_binning_2D1Dplot(keys, bin_points_dict, single_no_bins,X_values,title,name)
 		return pvalue
 
 
