@@ -15,6 +15,8 @@ import sys
 import os
 from scipy import stats
 import numpy as np
+from sklearn import preprocessing
+import matplotlib.pylab as plt
 #import matplotlib.pyplot as plt 
 #import numpy.matlib
 #from matplotlib.colors import Normalize
@@ -30,32 +32,34 @@ import numpy as np
 #dim_list = ast.literal_eval(sys.argv[3])
 #comp_file_list_list = ast.literal_eval(sys.argv[4])
 
-def weisser_searchsorted(l_test1, l_test2):
-        l_test1, l_test2 = np.array(l_test1), np.array(l_test2)
-        #print("l_test1 : ", l_test1)
-        l_tot = np.sort(np.append(l_test1, l_test2))
-        #print("l_tot : ", l_tot)
-        l_tot_cp, l_test1_cp, l_test2_cp  = l_tot.tolist(), l_test1.tolist(), l_test2.tolist()
-        pos1, pos2 = [],[]
-        #print("l_tot_cp : ",l_tot_cp)
-        for item_number, item in enumerate(l_tot_cp):
-                n1 = l_test1_cp.count(item)
-                n2 = l_test2_cp.count(item)
-                if np.random.choice(2, 1, p=[n1/float(n1+n2),n2/float(n1+n2) ]):
-                        l_test2_cp.remove(item)
-                        pos2.append(item_number)
-                else:
-                        l_test1_cp.remove(item)
-                        pos1.append(item_number)
+def norm_highD_searchsorted(l_test):
+        l_test = np.array(l_test).tolist()
+        l_set = sorted(set(l_test))
 
-        pos1 = np.array(pos1)
-        pos2 = np.array(pos2)
-        return (pos1,pos2)
+        pos = [0]*len(l_test)
+
+        pos_counter = 0
+        for item in l_set:
+                matches = [i for i in range(0,len(l_test)) if l_test[i]==item]
+                random.shuffle(matches)
+		for m in matches:
+                        pos[m]= pos_counter
+                        pos_counter+=1
+
+        pos = np.array(pos)
+        pos = pos/np.float(len(l_test)-1)
+
+        return pos
+
 
 def chi2_adaptive_binning_wrapper(orig_title, orig_name, dim_list, comp_file_list_list,number_of_splits_list,systematics_fraction):
 
 	sample1_name="original"
 	sample2_name="modified"
+
+	#transform='uniform'
+	transform='StandardScalar'
+	#transform='fill01'
 
 	DEBUG = False
 
@@ -81,11 +85,11 @@ def chi2_adaptive_binning_wrapper(orig_title, orig_name, dim_list, comp_file_lis
 			print("Operating of files :"+comp_file_0+"   "+comp_file_1)
 
 			#extracts data from the files
-			features_0=np.loadtxt(comp_file_0,dtype='d')
-			features_1=np.loadtxt(comp_file_1,dtype='d')
+			features_0=np.loadtxt(comp_file_0,dtype='d', ndmin=2)
+			features_1=np.loadtxt(comp_file_1,dtype='d', ndmin=2)
 
 			#only make a plot for the first data set
-			results_list=chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction,orig_title,orig_name, not counter,DEBUG)
+			results_list=chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction,orig_title,orig_name, not counter,DEBUG, transform)
 			for number_of_splits_index, number_of_splits in enumerate(number_of_splits_list):
 				score_dict[str(number_of_splits)].append(results_list[number_of_splits_index])	
 
@@ -106,7 +110,7 @@ def chi2_adaptive_binning_wrapper(orig_title, orig_name, dim_list, comp_file_lis
 
 
 
-def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction=0.0,title = "title", name="name", PLOT = True, DEBUG = False, normalised = False):
+def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematics_fraction=0.0,title = "title", name="name", PLOT = True, DEBUG = False, transform='StandardScalar'):
 	"""This function takes in two 2D arrays with all features being columns"""
 
 	max_number_of_splits = np.max(number_of_splits_list)
@@ -114,6 +118,8 @@ def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematic
 	no_0=features_0.shape[0]
 	no_1=features_1.shape[0]
 
+	print("features_0.shape : ", features_0.shape)
+	no_dim = features_0.shape[1]
 	#Give all samples in file 0 the label 0 and in file 1 the feature 1
 	label_0=np.zeros((no_0,1))
 	label_1=np.ones((no_1,1))
@@ -122,13 +128,47 @@ def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematic
 	data_0=np.c_[features_0,label_0]
 	data_1=np.c_[features_1,label_1]
 
+	features= np.r_[features_0,features_1]
+	labels=    np.r_[label_0,   label_1]
+
 	data=np.r_[data_0,data_1]
+	data_same=np.c_[features,labels]
 
-	no_dim = data.shape[1]-1
+	#print("data : ",data)
+	#print("data_same : ", data_same)
+	#print("np.sum(data!=data_same) : ",np.sum(data!=data_same))
+	assert np.sum(data!=data_same)==0
+	assert (no_dim == data.shape[1]-1)
 
+	if no_dim==2:
+		plt.scatter(features[:,0],features[:,1], 0.1)
+		plt.savefig('test.png')
+		plt.clf()
+
+	if transform=='StandardScalar':
+		features = preprocessing.scale(features)
+		data = np.c_[features,labels]
+
+        if transform=='uniform':
+		#data_new2 = data[:,0]
+                data_new  = norm_highD_searchsorted(data[:,0])
+                for D in range(1,no_dim):
+                        temp = norm_highD_searchsorted(data[:,D])
+                        data_new = np.c_[data_new,temp]
+			#data_new2= np.c_[data_new2,data[:,D]]
+		data_new = np.c_[data_new, np.r_[label_0,label_1]]
+		#data_new2= np.c_[data_new2,np.r_[label_0,label_1]]
+
+		print("data : ", data)
+		data = data_new
+		print("data new : ", data)
+		#print("data_new2 : ", data_new2)
+		#print("np.sum(data!=data_new2) : ",np.sum(data!=data_new2))
+
+	
 	np.random.shuffle(data)
 
-	#print("data.shape : ", data.shape)
+	assert (no_dim == data.shape[1]-1)
 	labels=data[:,-1]
 
 	X_values= data[:,:-1]
@@ -137,13 +177,21 @@ def chi2_adaptive_binning(features_0,features_1,number_of_splits_list,systematic
 	X_total_width = (np.subtract(X_max,X_min))
 	del data
 
-	#Scaling	
-	X_values = X_values - X_min[None,:]
-	X_values = X_values / X_total_width[None,:]
-
+	if transform=='fill01':
+		#Scaling	
+		X_values = X_values - X_min[None,:]
+		X_values = X_values / X_total_width[None,:]
+	
+	if True:
+		X_min = [0.]*no_dim
+		X_total_width = [1.]*no_dim
 	#b = X_values[:,0]
 	#print("b[b[:]>2].shape[0] : \n", b[b[:]>2].shape[0] )	
 	data = np.concatenate((X_values, labels[:,None]), axis=1)
+
+	if no_dim==2:
+		plt.scatter(data[:,0],data[:,1],0.1)
+		plt.savefig('test_scaled.png')
 
 	#print("X_values.shape : ",X_values.shape)
 	starting_boundary = []

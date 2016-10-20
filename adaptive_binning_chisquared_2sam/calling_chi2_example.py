@@ -7,7 +7,7 @@ import os
 def example_call():
 	orig_name="gauss__1_0__0_9"
 	title="Gauss 0.1 0.75"
-	dim_list = [1,2,3]
+	dim_list = [2,3]
 	systematics_fraction = 0.01
 
 	comp_file_list_list = []
@@ -18,7 +18,7 @@ def example_call():
 			comp_file_list.append((os.environ['learningml']+"/GoF/data/gaussian_same_projection_on_each_axis/gauss_data/gaussian_same_projection_on_each_axis_redefined_{0}D_10000_0.0_1.0_1.0_{1}.txt".format(dim_data,i),os.environ['learningml']+"/GoF/data/gaussian_same_projection_on_each_axis/gauss_data/gaussian_same_projection_on_each_axis_redefined_{0}D_10000_0.0_1.0_0.9_{1}.txt".format(dim_data,i)))
 		comp_file_list_list.append(comp_file_list)
 	if adaptive_binning==True:
-		number_of_splits_list = [1,2]
+		number_of_splits_list = [1,2,3]
 		#chi2_adaptive_binning.chi2_adaptive_binning(orig_name, dim_list, comp_file_list_list,number_of_splits_list)
 		chi2_adaptive_binning_wrapper(title,orig_name, dim_list, comp_file_list_list,number_of_splits_list,systematics_fraction)
 	else:
